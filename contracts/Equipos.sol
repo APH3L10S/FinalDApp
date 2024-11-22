@@ -12,8 +12,12 @@ contract Equipos {
     uint256 public totalEquipos;
 
     function crearEquipo(string memory _nombre, string memory _logoIPFS) public {
-        address;
-        equipos[totalEquipos] = Equipo(_nombre, _logoIPFS, jugadoresVacios);
+        // Creamos un nuevo equipo con un arreglo vacío de jugadores
+        equipos[totalEquipos] = Equipo({
+            nombre: _nombre,
+            logoIPFS: _logoIPFS,
+            jugadores: new address[] (0)
+        });
         totalEquipos++;
     }
 
