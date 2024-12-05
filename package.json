@@ -8,9 +8,16 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "Aplicación descentralizada (DApp) para la gestión de equipos y jugadores de eSports de League of Legends.\r Proyecto Final para la materia Desarrollo de Aplicaciones Descentralizadas",
   "dependencies": {
+    "@nomiclabs/hardhat-waffle": "^2.0.6",
     "@openzeppelin/contracts": "^4.0.0",
-    "hardhat": "^2.22.16"
+    "axios": "^1.7.9",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.1",
+    "ethers": "^5.7.0",
+    "hardhat": "^2.22.17"
   }
 }
