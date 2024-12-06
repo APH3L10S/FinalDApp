@@ -15,17 +15,17 @@ const wallet = new ethers.Wallet(process.env.PRIVATE_KEY, provider);
 
 // Direcciones de los contratos
 const contratos = {
-    Equipos: "direccion_del_contrato_equipos",
-    Jugadores: "direccion_del_contrato_jugadores",
-    NFT: "direccion_del_contrato_nft",
-    Wallet: "direccion_del_contrato_wallet",
+    Equipos: process.env.EQUIPOS_ADDRESS,
+    Jugadores: process.env.JUGADORES_ADDRESS,
+    NFT: process.env.NFT_ADDRESS,
+    Wallet: process.env.WALLET_ADDRESS,
 };
 
 // ABIs de los contratos
-const abiEquipos = require("./artifacts/contracts/Equipos.sol/Equipos.json").abi;
-const abiJugadores = require("./artifacts/contracts/Jugadores.sol/Jugadores.json").abi;
-const abiNFT = require("./artifacts/contracts/NFT.sol/NFT.json").abi;
-const abiWallet = require("./artifacts/contracts/Wallet.sol/Wallet.json").abi;
+const abiEquipos = require("../artifacts/contracts/Equipos.sol/Equipos.json").abi;
+const abiJugadores = require("../artifacts/contracts/Jugadores.sol/Jugadores.json").abi;
+const abiNFT = require("../artifacts/contracts/NFT.sol/NFT.json").abi;
+const abiWallet = require("../artifacts/contracts/Wallet.sol/Wallet.json").abi;
 
 // Instancias de contratos
 const equiposContract = new ethers.Contract(contratos.Equipos, abiEquipos, wallet);
