@@ -1,23 +1,39 @@
 {
   "name": "hardhat-project",
   "version": "1.0.0",
+  "description": "Aplicación descentralizada (DApp) para la gestión de equipos y jugadores de eSports de League of Legends. Proyecto Final para la materia Desarrollo de Aplicaciones Descentralizadas",
   "main": "hardhat.config.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "compile": "hardhat compile",
+    "test": "hardhat test",
+    "node": "hardhat node",
+    "deploy": "node scripts/deploy.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "Aplicación descentralizada (DApp) para la gestión de equipos y jugadores de eSports de League of Legends.\r Proyecto Final para la materia Desarrollo de Aplicaciones Descentralizadas",
   "dependencies": {
-    "@nomiclabs/hardhat-waffle": "^2.0.6",
-    "@openzeppelin/contracts": "^4.0.0",
-    "axios": "^1.7.9",
-    "dotenv": "^16.4.7"
+    "@nomicfoundation/hardhat-ethers": "^3.0.8",
+    "@nomicfoundation/hardhat-toolbox": "^3.0.0",
+    "@openzeppelin/contracts": "^4.9.2",
+    "axios": "^1.6.8",
+    "cors": "^2.8.5",
+    "ethers": "^5.7.0",
+    "express": "^4.19.2",
+    "find-config": "^1.0.0",
+    "multer": "^1.4.5-lts.1"
   },
   "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.1",
-    "ethers": "^5.7.0",
-    "hardhat": "^2.22.17"
-  }
+    "chai": "^4.3.7",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/APH3L10S/LoLDApp.git"
+  },
+  "bugs": {
+    "url": "https://github.com/APH3L10S/LoLDApp/issues"
+  },
+  "homepage": "https://github.com/APH3L10S/LoLDApp#readme"
 }
