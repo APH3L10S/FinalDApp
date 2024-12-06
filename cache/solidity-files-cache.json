@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Equipos.sol": {
-      "lastModificationDate": 1733380716774,
-      "contentHash": "9f4ef73c76f08811671baef6c6f01d54",
+      "lastModificationDate": 1733460353791,
+      "contentHash": "e5b3529a0c5b19fbcbab64e188effb2a",
       "sourceName": "contracts/Equipos.sol",
       "solcConfig": {
         "version": "0.8.27",
@@ -34,12 +34,13 @@
         "^0.8.0"
       ],
       "artifacts": [
-        "Equipos"
+        "Equipos",
+        "INFTContract"
       ]
     },
     "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Jugadores.sol": {
-      "lastModificationDate": 1733380894347,
-      "contentHash": "e5ed45c4d11c9f875431607248123c6c",
+      "lastModificationDate": 1733459290213,
+      "contentHash": "5cfc332bddddeec3dcde818bdb0bbbbf",
       "sourceName": "contracts/Jugadores.sol",
       "solcConfig": {
         "version": "0.8.27",
@@ -70,12 +71,13 @@
         "^0.8.0"
       ],
       "artifacts": [
+        "INFTContract",
         "Jugadores"
       ]
     },
     "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\NFT.sol": {
-      "lastModificationDate": 1733380952156,
-      "contentHash": "61adc6b51e292e4041e4fffc91edef91",
+      "lastModificationDate": 1733459263376,
+      "contentHash": "6882461dc47ec606e891104da2d45087",
       "sourceName": "contracts/NFT.sol",
       "solcConfig": {
         "version": "0.8.27",

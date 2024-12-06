@@ -1,4 +1,4 @@
-require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-ethers");
 require("dotenv").config();
 
 const { API_URL, PRIVATE_KEY } = process.env;

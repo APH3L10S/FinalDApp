@@ -77,7 +77,7 @@ contract Jugadores {
         (uint8 nftType, , address associatedPlayer, ) = nftContract.getNFTDetails(tokenId);
 
         require(nftType == 1, "NFT no es un reconocimiento"); // 1 = RECONOCIMIENTO
-        require(associatedPlayer == address(0), "NFT ya está asociado a otro jugador");
+        require(associatedPlayer == address(0), "NFT ya esta asociado a otro jugador");
 
         //Asociar el NFT al jugador
         jugadorNFTs[_id].push(tokenId);

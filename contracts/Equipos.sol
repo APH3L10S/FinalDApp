@@ -34,8 +34,8 @@ contract Equipos {
         equipos[totalEquipos] = Equipo({
             nombre: _nombre,
             logoIPFS: _logoIPFS,
-            jugadores: new address[](0)
-            coleccionables: new uint256 //[05-12-2024] - POSIBLE ERROR
+            jugadores: new address[](0),
+            coleccionables: new uint256[](0) //[05-12-2024] - POSIBLE ERROR
             });
         emit EquipoCreado(totalEquipos, _nombre, _logoIPFS);
         totalEquipos++;
