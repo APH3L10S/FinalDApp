@@ -16,8 +16,10 @@ contract NFT is ERC721, Ownable {
     struct NFTData {
         NFTType nftType; // Tipo de NFT
         string metadata; // Metadatos del NFT
+        //uint256 associatedPlayer; // ID del jugador asociado (si aplica)
         address associatedPlayer; // Dirección del jugador asociado (si aplica)
-        uint256 associatedTeam; // ID del equipo asociado (si aplica)
+        address associatedTeam; //Dirección del equipo asociado (si aplica)
+        //uint256 associatedTeam; // ID del equipo asociado (si aplica)
     }
 
     // Datos de los NFTs [05-12-2024]
@@ -35,7 +37,8 @@ contract NFT is ERC721, Ownable {
     constructor() ERC721("ChampionNFT", "NFT") {}
 
     // Acuñar/minar un NFT como "coleccionable" asociado a un EQUIPO [05-12-2024]
-    function mintColeccionable(address to, string memory metadata, uint256 teamId) public onlyOwner {
+    function mintColeccionable(address to, string memory metadata, address team) public onlyOwner {
+        //uint256 teamId
         _tokenIdCounter.increment();
         uint256 tokenId = _tokenIdCounter.current();
         _mint(to, tokenId);
@@ -43,12 +46,11 @@ contract NFT is ERC721, Ownable {
         _nftDetails[tokenId] = NFTData({
             nftType: NFTType.COLECCIONABLE,
             metadata: metadata,
-            associatedPlayer: address(0), // No aplica para coleccionables
-            associatedTeam: teamId
+            associatedPlayer: address(0), // No aplica para coleccionables - 0
+            associatedTeam: team //teamId
         });
 
         _ownerTokens[to].push(tokenId);
-
         emit NFTMinted(to, tokenId, NFTType.COLECCIONABLE, metadata);
     }
 
@@ -62,11 +64,10 @@ contract NFT is ERC721, Ownable {
             nftType: NFTType.RECONOCIMIENTO,
             metadata: metadata,
             associatedPlayer: player,
-            associatedTeam: 0 // No aplica para reconocimientos
+            associatedTeam: address(0) // No aplica para reconocimientos - 0
         });
 
         _ownerTokens[to].push(tokenId);
-
         emit NFTMinted(to, tokenId, NFTType.RECONOCIMIENTO, metadata);
     }
 
@@ -104,10 +105,28 @@ contract NFT is ERC721, Ownable {
         emit MetadataUpdated(tokenId, newMetadata);
     }
 
-    // Listar NFTs de un propietario
-    function getNFTsByOwner(address owner) public view returns (uint256[] memory) {
-        return _ownerTokens[owner];
+    //Borrar NFT
+    function deleteNFT(uint256 tokenId) public onlyOwner {
+        require(_exists(tokenId), "NFT no existe");
+
+        address owner = ownerOf(tokenId);
+        uint256[] storage tokens = _ownerTokens[owner];
+        for (uint256 i = 0; i < tokens.length; i++) {
+            if (tokens[i] == tokenId) {
+                tokens[i] = tokens[tokens.length - 1];
+                tokens.pop();
+                break;
+            }
+        }
+
+        _burn(tokenId);
+        delete _nftDetails[tokenId];
     }
+
+    // Listar NFTs de un propietario
+    //function getNFTsByOwner(address owner) public view returns (uint256[] memory) {
+        //return _ownerTokens[owner];
+    //}
 
     // Verificar existencia de un token
     function exists(uint256 tokenId) public view returns (bool) {
