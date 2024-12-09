@@ -19,13 +19,12 @@ async function main() {
   await equipos.deployed();
   console.log(`Contrato Equipos desplegado en: ${equipos.address}`);
 
-/*
-  // Desplegar el contrato Wallet
+
   const Wallet = await hre.ethers.getContractFactory("Wallet");
   const wallet = await Wallet.deploy();
   await wallet.deployed();
   console.log(`Contrato Wallet desplegado en: ${wallet.address}`);
-  */
+
 }
 
 main().catch((error) => {
