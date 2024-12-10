@@ -34,23 +34,23 @@ const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
 
 // Direcciones de los contratos
 const contratos = {
-  Equipos: EQUIPOS_ADDRESS,
-  Jugadores: JUGADORES_ADDRESS,
-  NFT: NFT_ADDRESS,
-  Wallet: WALLET_ADDRESS,
-};
+    Historial: process.env.HISTORIAL_ADDRESS,
+    Usuarios: process.env.USUARIOS_ADDRESS,
+    NFT: process.env.NFTJUGADOR_ADDRESS,
+    Wallet: process.env.WALLET_ADDRESS,
+  };
 
 // ABIs de los contratos
-const abiEquipos = require("../artifacts/contracts/Equipos.sol/Equipos.json").abi;
-const abiJugadores = require("../artifacts/contracts/Jugadores.sol/Jugadores.json").abi;
-const abiNFT = require("../artifacts/contracts/NFT.sol/NFT.json").abi;
+const abiHistorial = require("../artifacts/contracts/Historial.sol/Historial.json").abi;
+const abiUsuarios = require("../artifacts/contracts/Usuarios.sol/Usuarios.json").abi;
+const abiNFT = require("../artifacts/contracts/NFTJugador.sol/NFTJugador.json").abi;
 const abiWallet = require("../artifacts/contracts/Wallet.sol/Wallet.json").abi;
 
 // Instancias de contratos
-const equiposContract = new ethers.Contract(contratos.Equipos, abiEquipos, wallet);
-const jugadoresContract = new ethers.Contract(contratos.Jugadores, abiJugadores, wallet);
-const nftContract = new ethers.Contract(contratos.NFT, abiNFT, wallet);
-const walletContract = new ethers.Contract(contratos.Wallet, abiWallet, wallet);
+const historialContract = new ethers.Contract(process.env.HISTORIAL_ADDRESS, abiHistorial, wallet);
+const usuariosContract = new ethers.Contract(process.env.USUARIOS_ADDRESS, abiUsuarios, wallet);
+const nftContract = new ethers.Contract(process.env.NFTJUGADOR_ADDRESS, abiNFT, wallet);
+const walletContract = new ethers.Contract(process.env.WALLET_ADDRESS, abiWallet, wallet);
 
 // Función para subir imágenes a Pinata
 async function subirImagenAPinata(filePath) {
@@ -94,7 +94,7 @@ app.post("/equipos", upload.single("logo"), async (req, res) => {
     fs.unlinkSync(logoPath); // Eliminar archivo temporal después de subirlo
 
     // Crear equipo
-    const tx = await equiposContract.crearEquipo(nombre, logoIPFS);
+    const tx = await historialContract.crearEquipo(nombre, logoIPFS);
     await tx.wait();
 
     // Acuñar NFT para el equipo
@@ -118,7 +118,7 @@ app.get("/equipos/:idEquipo", async (req, res) => {
   const idEquipo = parseInt(req.params.idEquipo, 10);
 
   try {
-    const equipo = await equiposContract.consultarEquipo(idEquipo);
+    const equipo = await historialContract.consultarEquipo(idEquipo);
     res.json({
       idEquipo: equipo[0],
       nombre: equipo[1],
@@ -135,7 +135,7 @@ app.delete("/equipos/:idEquipo", async (req, res) => {
   const { idEquipo } = req.params;
 
   try {
-    const tx = await equiposContract.eliminarEquipo(idEquipo);
+    const tx = await historialContract.eliminarEquipo(idEquipo);
     await tx.wait();
     res.json({ message: "Equipo eliminado con éxito", txHash: tx.hash });
   } catch (error) {
@@ -161,7 +161,7 @@ app.post("/jugadores", upload.single("imagen"), async (req, res) => {
     fs.unlinkSync(imagenPath);
 
     // Registrar jugador
-    const tx = await jugadoresContract.registrarJugador(
+    const tx = await usuariosContract.registrarJugador(
       idJugador,
       nombre,
       nickname,
@@ -191,7 +191,7 @@ app.post("/jugadores", upload.single("imagen"), async (req, res) => {
 app.get("/jugadores/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    const jugador = await jugadoresContract.obtenerJugador(id);
+    const jugador = await usuariosContract.obtenerJugador(id);
     res.json({ jugador });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -203,7 +203,7 @@ app.delete("/jugadores/:id", async (req, res) => {
   const { id } = req.params;
 
   try {
-    const tx = await jugadoresContract.eliminarJugador(id);
+    const tx = await usuariosContract.eliminarJugador(id);
     await tx.wait();
     res.json({ message: "Jugador eliminado con éxito", txHash: tx.hash });
   } catch (error) {
