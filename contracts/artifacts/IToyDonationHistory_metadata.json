@@ -1,0 +1,74 @@
+{
+	"compiler": {
+		"version": "0.8.26+commit.8a97fa7a"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "_transactionId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "_donor",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "_recipient",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "_amount",
+						"type": "uint256"
+					}
+				],
+				"name": "recordDonation",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/WalletMultiSig.sol": "IToyDonationHistory"
+		},
+		"evmVersion": "cancun",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"contracts/WalletMultiSig.sol": {
+			"keccak256": "0x07f6723b69d35e20e49b115b1ee5bae32b65c0f93334035cf523145b0085e221",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0c34286f2e8231265731c8f8bc869265993aec3d32d3c3673c924c6107add8d0",
+				"dweb:/ipfs/QmQa5L2ezY5JVJNJT1SipHgF1XCCzT9UnThGDRLyuRTo7r"
+			]
+		}
+	},
+	"version": 1
+}

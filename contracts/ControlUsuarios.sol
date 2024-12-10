@@ -1,100 +1,123 @@
-// SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity >=0.8.0 <0.9.0;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/Counters.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 
-contract ControlUsuarios is Ownable {
-    using Counters for Counters.Counter;
+contract DonacionesDeJuguetes {
+    using ECDSA for bytes32;
 
-    Counters.Counter private _teamIds; //Contiene IDs de los equipos
-    Counters.Counter private _playerIds; //Contiene IDs de los jugadores
+    address private owner;
+    uint256 private usuarioIdCounter;
 
-    struct Team {
-        uint256 id;
-        string name;
-        string acronym;
-        string country;
-        string league;
-        address publicKey;
-        address privateKey;
+    struct Usuario {
+        string nombre;
+        string apellido;
+        string direccion;
+        uint256 usuarioId;
+        string tipoUsuario; // "Donante" o "Receptor"
+        address clavePublica;
+        bytes32 passwordHash;
     }
 
-    struct Player {
-        uint256 id;
-        string name;
-        string nickname;
-        string nationality;
-        string role;
-        address publicKey;
-        address privateKey;
+    mapping(address => Usuario) private usuarios;
+    address[] private listaUsuarios;
+
+    modifier soloOwner() {
+        require(msg.sender == owner, "Solo el owner puede realizar esta accion");
+        _;
     }
 
-    mapping(uint256 => Team) private teams; //Mapping donde estarán contenidos los equipos (y su información)
-    mapping(uint256 => Player) private players; //Mapping donde estarán contenidos los jugadores (y su información)
-
-    event TeamRegistered(uint256 id, string name); //Evento - Se registró un equipo
-    event PlayerRegistered(uint256 id, string name); //Evento - Se registró un jugador
-
-    function registerTeam(
-        string memory name,
-        string memory acronym,
-        string memory country,
-        string memory league,
-        address publicKey,
-        address privateKey
-    ) public returns (uint256) {
-        _teamIds.increment();
-        uint256 newTeamId = _teamIds.current(); //Asignar ID al equipo
-        teams[newTeamId] = Team(newTeamId, name, acronym, country, league, publicKey, privateKey);
-        emit TeamRegistered(newTeamId, name); //Emitir evento - Se registró un equipo
-        return newTeamId;
+    constructor() {
+        owner = msg.sender;
+        usuarioIdCounter = 1;
     }
 
-    function registerPlayer(
-        string memory name,
-        string memory nickname,
-        string memory nationality,
-        string memory role,
-        address publicKey,
-        address privateKey
-    ) public returns (uint256) {
-        _playerIds.increment();
-        uint256 newPlayerId = _playerIds.current(); //Asignar ID al jugador
-        players[newPlayerId] = Player(newPlayerId, name, nickname, nationality, role, publicKey, privateKey);
-        emit PlayerRegistered(newPlayerId, name); //Emitir evento - Se registró un jugador
-        return newPlayerId;
+    function agregarUsuario(
+        string memory _nombre,
+        string memory _apellido,
+        string memory _direccion,
+        string memory _tipoUsuario, // Donante o Receptor
+        address _clavePublica,
+        string memory _password
+    ) public soloOwner {
+        require(usuarios[_clavePublica].clavePublica == address(0), "Usuario ya existe");
+
+        bytes32 passwordHash = keccak256(abi.encodePacked(_password));
+
+        usuarios[_clavePublica] = Usuario({
+            nombre: _nombre,
+            apellido: _apellido,
+            direccion: _direccion,
+            usuarioId: usuarioIdCounter,
+            tipoUsuario: _tipoUsuario,
+            clavePublica: _clavePublica,
+            passwordHash: passwordHash
+        });
+
+        listaUsuarios.push(_clavePublica);
+        usuarioIdCounter++;
     }
 
-    //Obtener información de todos los equipos almacenados
-    function getTeams() public view returns (Team[] memory) {
-        Team[] memory teamsArray = new Team[](_teamIds.current());
-        for(uint256 i = 0; i < _teamIds.current(); i++) {
-            Team storage team = teams[i+1];
-            teamsArray[i] = team;
+    function buscarUsuario(address _clavePublica)
+        public
+        view
+        returns (
+            string memory nombre,
+            string memory apellido,
+            string memory direccion,
+            uint256 usuarioId,
+            string memory tipoUsuario
+        )
+    {
+        require(usuarios[_clavePublica].clavePublica != address(0), "Usuario no existe");
+        Usuario memory usuario = usuarios[_clavePublica];
+        return (usuario.nombre, usuario.apellido, usuario.direccion, usuario.usuarioId, usuario.tipoUsuario);
+    }
+
+    function eliminarUsuario(address _clavePublica) public soloOwner {
+        require(usuarios[_clavePublica].clavePublica != address(0), "Usuario no existe, no se realizara la eliminacion");
+
+        delete usuarios[_clavePublica];
+
+        for (uint256 i = 0; i < listaUsuarios.length; i++) {
+            if (listaUsuarios[i] == _clavePublica) {
+                listaUsuarios[i] = listaUsuarios[listaUsuarios.length - 1];
+                listaUsuarios.pop();
+                break;
+            }
         }
-        return teamsArray;
     }
-    
-    //Obtener información de todos los jugadores almacenados
-    function getPlayers() public view returns (Player[] memory) {
-        Player[] memory playersArray = new Player[](_playerIds.current());
-        for(uint256 i = 0; i < _playerIds.current(); i++) {
-            Player storage player = players[i+1];
-            playersArray[i] = player;
+
+    function traerTodosLosUsuarios() public view returns (Usuario[] memory) {
+        Usuario[] memory result = new Usuario[](listaUsuarios.length);
+        for (uint256 i = 0; i < listaUsuarios.length; i++) {
+            result[i] = usuarios[listaUsuarios[i]];
         }
-        return playersArray;
+        return result;
     }
 
-    //Obtener información de un equipo en base a su ID
-    function getTeamById(uint256 teamId) public view returns (Team memory) {
-        require(teamId > 0 && teamId <= _teamIds.current(), "El equipo no existe o no fue registrado correctamente");
-        return teams[teamId]; //Imprimir información solamente del equipo con ese ID
+    function modificarUsuario(
+        address _clavePublica,
+        string memory _nombre,
+        string memory _apellido,
+        string memory _direccion,
+        string memory _tipoUsuario
+    ) public soloOwner {
+        require(usuarios[_clavePublica].clavePublica != address(0), "Usuario no existe, no se realizara la modificacion");
+
+        Usuario storage usuario = usuarios[_clavePublica];
+        usuario.nombre = _nombre;
+        usuario.apellido = _apellido;
+        usuario.direccion = _direccion;
+        usuario.tipoUsuario = _tipoUsuario;
     }
 
-    //Obtener información de un jugador en base a su ID
-    function getPlayerById(uint256 playerId) public view returns (Player memory) {
-        require(playerId > 0 && playerId <= _playerIds.current(), "El jugador no existe o no fue registrado correctamente");
-        return players[playerId];
+    function login(address _clavePublica, string memory _password) public view returns (bool) {
+        require(usuarios[_clavePublica].clavePublica != address(0), "Usuario no existe");
+
+        bytes32 passwordHash = keccak256(abi.encodePacked(_password));
+        require(passwordHash == usuarios[_clavePublica].passwordHash, "Password incorrecto");
+
+        return true; // Login exitoso
     }
 }
