@@ -38,3 +38,21 @@ main().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
+
+//Martes, 12 de Noviembre de 2024 - DEPLOY DEL ULTIMO CONTRATO WalletMultiSig (Wallet MultiFirma)
+//(Al momento de ejecutar, comentar el código anterior de deploy)
+/*async function multiDeploy() {
+    const owners = ["", ""] //Colocar las direcciones públicas de dos cuentas
+    //En un equipo debemos tener dos cuentas (una por integrante)
+    const requiredApprovals = 2;
+    const WalletMultiSig = await ethers.getContractFactory("WalletMultiSig"); //Nombre del contrato
+    const wallet = await WalletMultiSig.deploy(owners, requiredApprovals); //Parámetros del constructor
+    console.log("WalletMultiSig deployed to: ",wallet.address); //Dirección del contrato
+}
+
+multiDeploy()
+.then(()=>process.exit(0))
+.catch((error) => {
+    console.error(error);
+    process.exit(1);
+})*/
