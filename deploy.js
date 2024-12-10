@@ -1,30 +1,37 @@
 const hre = require("hardhat");
 
 async function main() {
-  // Desplegar el contrato NFTs
-  const NFTs = await hre.ethers.getContractFactory("NFT");
-  const nfts = await NFTs.deploy();
-  await nfts.deployed();
-  console.log(`Contrato NFTs desplegado en: ${nfts.address}`);
+  // Desplegar el contrato NFTJugador (NFTs de los jugadores)
+  const NFTJugador = await hre.ethers.getContractFactory("NFTJugador");
+  const nftJugador = await NFTJugador.deploy();  // Asegúrate de que no falten parámetros en el constructor
+  await nftJugador.deployed();
+  console.log(`Contrato NFTJugador desplegado en: ${nftJugador.address}`);
 
-  // Desplegar el contrato Jugadores
-  const Jugadores = await hre.ethers.getContractFactory("Jugadores");
-  const jugadores = await Jugadores.deploy(nfts.address); //Pasar dirección del contrato de NFTs [07-12-2024]
-  await jugadores.deployed();
-  console.log(`Contrato Jugadores desplegado en: ${jugadores.address}`);
+  // Desplegar el contrato Usuarios (no necesita parámetros en el constructor)
+  const Usuarios = await hre.ethers.getContractFactory("Usuarios");
+  const usuarios = await Usuarios.deploy();  // No necesita parámetros en el constructor
+  await usuarios.deployed();
+  console.log(`Contrato Usuarios desplegado en: ${usuarios.address}`);
 
-  // Desplegar el contrato Equipos
-  const Equipos = await hre.ethers.getContractFactory("Equipos");
-  const equipos = await Equipos.deploy(nfts.address, jugadores.address); //Pasar dirección del contrato de NFTs [07-12-2024]
-  await equipos.deployed();
-  console.log(`Contrato Equipos desplegado en: ${equipos.address}`);
+  // Desplegar el contrato Historial
+  const Historial = await hre.ethers.getContractFactory("Historial");
+  const historial = await Historial.deploy();  // Asegúrate de que el contrato no requiera parámetros o pasa los necesarios
+  await historial.deployed();
+  console.log(`Contrato Historial desplegado en: ${historial.address}`);
 
-
+  // Desplegar el contrato Wallet (Wallet Multifirma)
   const Wallet = await hre.ethers.getContractFactory("Wallet");
-  const wallet = await Wallet.deploy();
+
+  // Definir las direcciones de los propietarios y el número de confirmaciones necesarias
+  const owners = [
+    "0x9C55a48A1Bd4cac888f2147af8915845CDEcb062",
+    "0xDB303608363F03B24E8Fb1F3f22B34C734F32dFe"
+  ];
+  const numConfirmationsRequired = 2; // Número de confirmaciones necesarias para aprobar una transacción
+
+  const wallet = await Wallet.deploy(owners, numConfirmationsRequired);
   await wallet.deployed();
   console.log(`Contrato Wallet desplegado en: ${wallet.address}`);
-
 }
 
 main().catch((error) => {

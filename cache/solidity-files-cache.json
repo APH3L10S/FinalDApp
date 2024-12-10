@@ -1,121 +1,6 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Equipos.sol": {
-      "lastModificationDate": 1733710035305,
-      "contentHash": "3d3159ebd94acb119c19e2c2e18952df",
-      "sourceName": "contracts/Equipos.sol",
-      "solcConfig": {
-        "version": "0.8.27",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "Equipos",
-        "IJugadoresContract",
-        "INFTContract"
-      ]
-    },
-    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Jugadores.sol": {
-      "lastModificationDate": 1733702040561,
-      "contentHash": "0879e55bddb1de4dffceb247abfeddbd",
-      "sourceName": "contracts/Jugadores.sol",
-      "solcConfig": {
-        "version": "0.8.27",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "INFTContract",
-        "Jugadores"
-      ]
-    },
-    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\NFT.sol": {
-      "lastModificationDate": 1733702040562,
-      "contentHash": "df79737ff86e972ee54f0fab9b17ce0e",
-      "sourceName": "contracts/NFT.sol",
-      "solcConfig": {
-        "version": "0.8.27",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "@openzeppelin/contracts/token/ERC721/ERC721.sol",
-        "@openzeppelin/contracts/access/Ownable.sol",
-        "@openzeppelin/contracts/utils/Counters.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.0"
-      ],
-      "artifacts": [
-        "NFT"
-      ]
-    },
     "C:\\Aplicaciones Descentralizadas\\LoLDApp\\node_modules\\@openzeppelin\\contracts\\utils\\Counters.sol": {
       "lastModificationDate": 1733382847952,
       "contentHash": "74654e3ae5d7f39555055dfe244dab7a",
@@ -604,8 +489,8 @@
       ]
     },
     "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Wallet.sol": {
-      "lastModificationDate": 1733383519387,
-      "contentHash": "da7749e92cc3756de36c3002ba80d92b",
+      "lastModificationDate": 1733798393226,
+      "contentHash": "d804af0b4f65200f1e6d86adaf7acf04",
       "sourceName": "contracts/Wallet.sol",
       "solcConfig": {
         "version": "0.8.27",
@@ -637,6 +522,267 @@
       ],
       "artifacts": [
         "Wallet"
+      ]
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Historial.sol": {
+      "lastModificationDate": 1733798462368,
+      "contentHash": "39e0988f9f2953886e063dc4b9bf763d",
+      "sourceName": "contracts/Historial.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Historial"
+      ]
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\NFTJugador.sol": {
+      "lastModificationDate": 1733798427099,
+      "contentHash": "f303a069b4d5d89290980b60e3807122",
+      "sourceName": "contracts/NFTJugador.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+        "@openzeppelin/contracts/utils/Counters.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "NFTJugador"
+      ]
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\node_modules\\@openzeppelin\\contracts\\token\\ERC721\\extensions\\ERC721URIStorage.sol": {
+      "lastModificationDate": 1733448646460,
+      "contentHash": "de368c6a87e159c86544ae5041b58cf3",
+      "sourceName": "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../ERC721.sol",
+        "../../../interfaces/IERC4906.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "ERC721URIStorage"
+      ]
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC4906.sol": {
+      "lastModificationDate": 1733448647155,
+      "contentHash": "d3f355e15269d1476d86c84730cebb5e",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC4906.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "./IERC165.sol",
+        "./IERC721.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "IERC4906"
+      ]
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC165.sol": {
+      "lastModificationDate": 1733448646912,
+      "contentHash": "ee9624272968c23d93d4c2e39f06e6e2",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC165.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/introspection/IERC165.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": []
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\node_modules\\@openzeppelin\\contracts\\interfaces\\IERC721.sol": {
+      "lastModificationDate": 1733448647179,
+      "contentHash": "e6da7798a8c22c5043cc42d64a2a8f80",
+      "sourceName": "@openzeppelin/contracts/interfaces/IERC721.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../token/ERC721/IERC721.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": []
+    },
+    "C:\\Aplicaciones Descentralizadas\\LoLDApp\\contracts\\Usuarios.sol": {
+      "lastModificationDate": 1733798443127,
+      "contentHash": "8053bc93c7165ff606b515cc3767a5ed",
+      "sourceName": "contracts/Usuarios.sol",
+      "solcConfig": {
+        "version": "0.8.27",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.0"
+      ],
+      "artifacts": [
+        "Usuarios"
       ]
     }
   }
