@@ -33,30 +33,31 @@ contract DonacionesDeJuguetes {
     }
 
     function agregarUsuario(
-        string memory _nombre,
-        string memory _apellido,
-        string memory _direccion,
-        string memory _tipoUsuario, // Donante o Receptor
-        address _clavePublica,
-        string memory _password
-    ) public soloOwner {
-        require(usuarios[_clavePublica].clavePublica == address(0), "Usuario ya existe");
+    string memory _nombre,
+    string memory _apellido,
+    string memory _direccion,
+    string memory _tipoUsuario, // Donante o Receptor
+    address _clavePublica,
+    string memory _password
+        ) public {
+    require(usuarios[_clavePublica].clavePublica == address(0), "Usuario ya existe");
 
-        bytes32 passwordHash = keccak256(abi.encodePacked(_password));
+    bytes32 passwordHash = keccak256(abi.encodePacked(_password));
 
-        usuarios[_clavePublica] = Usuario({
-            nombre: _nombre,
-            apellido: _apellido,
-            direccion: _direccion,
-            usuarioId: usuarioIdCounter,
-            tipoUsuario: _tipoUsuario,
-            clavePublica: _clavePublica,
-            passwordHash: passwordHash
-        });
+    usuarios[_clavePublica] = Usuario({
+        nombre: _nombre,
+        apellido: _apellido,
+        direccion: _direccion,
+        usuarioId: usuarioIdCounter,
+        tipoUsuario: _tipoUsuario,
+        clavePublica: _clavePublica,
+        passwordHash: passwordHash
+    });
 
-        listaUsuarios.push(_clavePublica);
-        usuarioIdCounter++;
-    }
+    listaUsuarios.push(_clavePublica);
+    usuarioIdCounter++;
+}
+
 
     function buscarUsuario(address _clavePublica)
         public

@@ -1,265 +1,151 @@
-const express = require("express");
-const { ethers } = require("ethers");
-const bodyParser = require("body-parser");
-const axios = require("axios");
-const cors = require("cors");
-const multer = require("multer"); // Manejo de imágenes con Multer
-const FormData = require("form-data"); 
-const fs = require("fs"); // Manejo de archivos
-require("dotenv").config({ path: require("find-config")(".env") }); 
+let contract;
+let clavePublica;
+let contractHistory;
+import dotenv from "dotenv";
+dotenv.config();
 
-// Cargar las variables de entorno
-const {
-  PRIVATE_KEY,
-  API_URL,
-  PUBLIC_KEY,
-  PINATA_API_KEY,
-  PINATA_SECRET_KEY,
-  NFT_ADDRESS,
-  JUGADORES_ADDRESS,
-  EQUIPOS_ADDRESS,
-  WALLET_ADDRESS,
-} = process.env;
+// Obtener la dirección pública y contrato almacenado después del inicio de sesión
+document.addEventListener("DOMContentLoaded", async function () {
+  const almacenClavePublica = localStorage.getItem("clavePublica");
+  const direccionContrato = localStorage.getItem("direccionContrato");
+  const direccionContratoHistorial = process.env.TOYDONATIONHISTORY_ADDRESS; // Dirección del contrato de historial de donaciones
 
-const app = express();
-app.use(bodyParser.json());
-app.use(cors());
+  if (almacenClavePublica && direccionContrato) {
+    clavePublica = almacenClavePublica;
 
-// Configuración de Multer para manejo de imágenes
-const upload = multer({ dest: "uploads/" });
+    // ABI del contrato de Donación de Juguetes
+    const contractABI =
+      require("../artifacts/contracts/ToyDonationNFT.sol/ToyDonationNFT.json").abi;
 
-// Configuración de ethers.js
-const provider = new ethers.providers.JsonRpcProvider(API_URL);
-const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
+    const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    const signer = provider.getSigner();
+    contract = new ethers.Contract(direccionContrato, contractABI, signer);
 
-// Direcciones de los contratos
-const contratos = {
-    Historial: process.env.HISTORIAL_ADDRESS,
-    Usuarios: process.env.USUARIOS_ADDRESS,
-    NFT: process.env.NFTJUGADOR_ADDRESS,
-    Wallet: process.env.WALLET_ADDRESS,
-  };
+    // Contrato del historial de donaciones de juguetes
+    const historyABI =
+      require("../artifacts/contracts/Historial.sol/ToyDonationHistory.json").abi;
 
-// ABIs de los contratos
-const abiHistorial = require("../artifacts/contracts/Historial.sol/Historial.json").abi;
-const abiUsuarios = require("../artifacts/contracts/Usuarios.sol/Usuarios.json").abi;
-const abiNFT = require("../artifacts/contracts/NFTJugador.sol/NFTJugador.json").abi;
-const abiWallet = require("../artifacts/contracts/Wallet.sol/Wallet.json").abi;
+    contractHistory = new ethers.Contract(
+      direccionContratoHistorial,
+      historyABI,
+      signer
+    );
 
-// Instancias de contratos
-const historialContract = new ethers.Contract(process.env.HISTORIAL_ADDRESS, abiHistorial, wallet);
-const usuariosContract = new ethers.Contract(process.env.USUARIOS_ADDRESS, abiUsuarios, wallet);
-const nftContract = new ethers.Contract(process.env.NFTJUGADOR_ADDRESS, abiNFT, wallet);
-const walletContract = new ethers.Contract(process.env.WALLET_ADDRESS, abiWallet, wallet);
+    // Llamar a buscarUsuario para verificar el tipo de usuario y habilitar el botón de donación
+    const usuario = await contract.buscarUsuario(clavePublica);
+    const tipoUsuario = usuario[4];
 
-// Función para subir imágenes a Pinata
-async function subirImagenAPinata(filePath) {
-  const url = `https://api.pinata.cloud/pinning/pinFileToIPFS`;
-
-  if (!fs.existsSync(filePath)) {
-    throw new Error("El archivo no existe en la ruta especificada.");
+    if (tipoUsuario && tipoUsuario.toLowerCase() === "donante") {
+      document.getElementById("donarButton").disabled = false;
+    }
   }
+});
 
-  const formData = new FormData();
-  formData.append("file", fs.createReadStream(filePath)); // Asegurar de que filePath es válido
-
-  const metadata = JSON.stringify({ name: "Imagen" });
-  formData.append("pinataMetadata", metadata);
-
-  const options = JSON.stringify({ cidVersion: 0 });
-  formData.append("pinataOptions", options);
-
-  const headers = {
-    ...formData.getHeaders(),
-    pinata_api_key: PINATA_API_KEY,
-    pinata_secret_api_key: PINATA_SECRET_KEY,
-  };
-
+// Función para mostrar el historial de donaciones
+async function mostrarHistorial() {
   try {
-    const response = await axios.post(url, formData, { headers });
-    return response.data.IpfsHash;
+    if (!clavePublica || !contractHistory) {
+      alert(
+        "No se encontraron credenciales del usuario. Inicia sesión primero."
+      );
+      return;
+    }
+
+    // Llamada al contrato para obtener el historial de donaciones del usuario
+    const donations = await contractHistory.getDonationHistoryByAddress(
+      clavePublica
+    );
+
+    let historialHtml =
+      "<h2 class='text-4xl font-bold text-center text-blue-600 mb-6'>Historial de Donaciones de Juguetes</h2>";
+
+    // Contenedor para las donaciones
+    historialHtml +=
+      "<div class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8'>";
+
+    donations.forEach((donation) => {
+      historialHtml += `
+        <div class='bg-white shadow-lg rounded-lg p-6'>
+          <h3 class='text-xl font-semibold text-blue-700 mb-2'>ID Transacción: #${
+            donation.transactionId
+          }</h3>
+          <p class='text-md text-gray-700 mb-2'><strong>Donante:</strong> ${
+            donation.donor
+          }</p>
+          <p class='text-md text-gray-700 mb-2'><strong>Receptor:</strong> ${
+            donation.recipient
+          }</p>
+          <p class='text-md text-gray-700 mb-2'><strong>Cantidad de Juguetes:</strong> ${
+            donation.amount
+          }</p>
+          <p class='text-md text-gray-700 mb-4'><strong>Fecha:</strong> ${new Date(
+            donation.timestamp * 1000
+          ).toLocaleString()}</p>
+          
+          <!-- Botón con estilo -->
+          <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mt-2 transition duration-300 ease-in-out transform hover:scale-105">
+            Ver Detalles
+          </button>
+        </div>
+      `;
+    });
+
+    historialHtml += "</div>"; // Cierre del contenedor
+
+    // Colocar el HTML en el contenedor
+    document.getElementById("content").innerHTML = historialHtml;
+    document.getElementById("content").classList.remove("hidden");
+    document.getElementById("perfilUsuario").classList.add("hidden");
   } catch (error) {
-    console.error("Error al subir imagen a Pinata:", error.message);
-    throw new Error("No se pudo subir la imagen a Pinata");
+    console.error(
+      "Error al intentar obtener el historial de donaciones:",
+      error
+    );
+    alert("Hubo un problema al obtener el historial de donaciones.");
   }
 }
 
-// Rutas para el contrato Equipos
-app.post("/equipos", upload.single("logo"), async (req, res) => {
-  const { nombre, nftMetaData } = req.body; 
-  const logoPath = req.file.path;
-
+async function mostrarPerfil() {
   try {
-    const logoIPFS = await subirImagenAPinata(logoPath);
-    fs.unlinkSync(logoPath); // Eliminar archivo temporal después de subirlo
+    if (!clavePublica || !contract) {
+      alert(
+        "No se encontraron credenciales del usuario. Inicia sesión primero."
+      );
+      return;
+    }
 
-    // Crear equipo
-    const tx = await historialContract.crearEquipo(nombre, logoIPFS);
-    await tx.wait();
+    const usuario = await contract.buscarUsuario(clavePublica);
 
-    // Acuñar NFT para el equipo
-    const nftTx = await nftContract.mintColeccionable(wallet.address, nftMetaData, nombre); 
-    await nftTx.wait();
+    document.getElementById("nombre").value = usuario[0];
+    document.getElementById("apellido").value = usuario[1];
+    document.getElementById("direccion").value = usuario[2];
+    document.getElementById("tipoUsuario").value = usuario[4];
 
-    res.json({
-      message: "Equipo creado con éxito y NFT minado",
-      nombre,
-      logoIPFS,
-      txHash: tx.hash,
-      nftTxHash: nftTx.hash,
-    });
+    document.getElementById("content").classList.add("hidden");
+    document.getElementById("perfilUsuario").classList.remove("hidden");
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error al intentar obtener el perfil del usuario:", error);
+    alert("Hubo un problema al obtener la información del perfil.");
   }
-});
+}
 
-// Consultar equipos registrados
-app.get("/equipos/:idEquipo", async (req, res) => {
-  const idEquipo = parseInt(req.params.idEquipo, 10);
-
-  try {
-    const equipo = await historialContract.consultarEquipo(idEquipo);
-    res.json({
-      idEquipo: equipo[0],
-      nombre: equipo[1],
-      logoIPFS: equipo[2],
-      nftId: equipo[3],
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+function mostrarSeccion(seccion) {
+  if (seccion === "inicio") {
+    location.reload();
   }
-});
+}
 
-// Eliminar equipo
-app.delete("/equipos/:idEquipo", async (req, res) => {
-  const { idEquipo } = req.params;
+function cerrarSesion() {
+  localStorage.removeItem("clavePublica");
+  localStorage.removeItem("direccionContrato");
 
-  try {
-    const tx = await historialContract.eliminarEquipo(idEquipo);
-    await tx.wait();
-    res.json({ message: "Equipo eliminado con éxito", txHash: tx.hash });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
+  window.location.href = "Login.html";
+}
+
+function redirigirADonacion() {
+  if (!document.getElementById("donarButton").disabled) {
+    window.location.href = "donacion.html";
+  } else {
+    alert("Solo los donantes pueden realizar una donación de juguetes.");
   }
-});
-
-// Rutas para el contrato Jugadores
-app.post("/jugadores", upload.single("imagen"), async (req, res) => {
-  const {
-    idJugador,
-    nombre,
-    nickname,
-    rol,
-    nacionalidad,
-    equipoId,
-    nftMetaData,
-  } = req.body;
-  const imagenPath = req.file.path;
-
-  try {
-    const imagenIPFS = await subirImagenAPinata(imagenPath);
-    fs.unlinkSync(imagenPath);
-
-    // Registrar jugador
-    const tx = await usuariosContract.registrarJugador(
-      idJugador,
-      nombre,
-      nickname,
-      rol,
-      nacionalidad,
-      imagenIPFS,
-      equipoId
-    );
-    await tx.wait();
-
-    // Acuñar NFT para el jugador
-    const nftTx = await nftContract.mintReconocimiento(wallet.address, nftMetaData, equipoId);
-    await nftTx.wait();
-
-    res.json({
-      message: "Jugador registrado con éxito y NFT minado",
-      imagenIPFS,
-      txHash: tx.hash,
-      nftTxHash: nftTx.hash,
-    });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Consultar jugadores registrados
-app.get("/jugadores/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const jugador = await usuariosContract.obtenerJugador(id);
-    res.json({ jugador });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Eliminar jugador
-app.delete("/jugadores/:id", async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    const tx = await usuariosContract.eliminarJugador(id);
-    await tx.wait();
-    res.json({ message: "Jugador eliminado con éxito", txHash: tx.hash });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Rutas para el contrato NFT
-app.post("/nft", async (req, res) => {
-  const { to, metadata } = req.body;
-  try {
-    const tx = await nftContract.mint(to, metadata);
-    await tx.wait();
-    res.json({ message: "NFT acuñado con éxito", txHash: tx.hash });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get("/nft/:id", async (req, res) => {
-  const { id } = req.params;
-  try {
-    const metadata = await nftContract.getMetadata(id);
-    res.json({ metadata });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Rutas para el contrato Wallet
-app.post("/wallet/submit", async (req, res) => {
-  const { to, amount } = req.body;
-  try {
-    const tx = await walletContract.submitTransaction(
-      to,
-      ethers.utils.parseEther(amount)
-    );
-    await tx.wait();
-    res.json({ message: "Transacción creada con éxito", txHash: tx.hash });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.post("/wallet/approve", async (req, res) => {
-  const { transactionId } = req.body;
-  try {
-    const tx = await walletContract.approveTransaction(transactionId);
-    await tx.wait();
-    res.json({ message: "Transacción aprobada con éxito", txHash: tx.hash });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-// Iniciar el servidor
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor corriendo en http://localhost:${process.env.PORT}`);
-});
+}

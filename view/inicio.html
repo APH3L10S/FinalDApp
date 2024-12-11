@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donación de Juguetes - Ayuda a los Niños</title>
+
+    <!-- Fuentes de Google -->
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap">
+
+    <!-- Estilos Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+    <!-- Icono de la página -->
+    <link rel="icon" href="https://example.com/favicon.ico" type="image/x-icon">
+
+    <!-- Script de la funcionalidad -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+</head>
+
+<body class="bg-gray-50 font-sans text-gray-800">
+
+    <!-- Sección principal -->
+    <div class="flex flex-col min-h-screen">
+
+        <!-- Barra superior -->
+        <header class="bg-blue-600 text-white py-4">
+            <div class="max-w-6xl mx-auto px-4">
+                <h1 class="text-3xl font-bold text-center">Donación de Juguetes</h1>
+                <p class="text-center mt-2">Ayuda a los niños necesitados con tu donación de juguetes</p>
+            </div>
+        </header>
+
+        <!-- Imagen de fondo -->
+        <section class="relative bg-cover bg-center h-[400px]" style="background-image: url('../images/bear.png');">
+            <div class="absolute inset-0 bg-black opacity-50"></div>
+            <div class="relative z-10 text-center text-white">
+                <h2 class="text-4xl font-bold">¡Tu donación puede hacer la diferencia!</h2>
+            </div>
+        </section>
+
+        <!-- Información principal -->
+        <section class="px-6 py-10 bg-white shadow-lg mx-auto max-w-6xl">
+            <h2 class="text-2xl font-semibold text-center mb-6">Haz tu donación hoy mismo</h2>
+            <p class="text-center text-lg mb-8">Los niños en situaciones vulnerables necesitan tu apoyo. ¡Cualquier
+                juguete que puedas donar será muy apreciado!</p>
+            <div class="flex justify-center">
+                <button id="donarButton"
+                    class="px-6 py-3 bg-green-500 text-white font-semibold rounded-full shadow-lg hover:bg-green-600 transition-all"
+                    onclick="redirigirADonacion()">
+                    Dona ahora
+                </button>
+            </div>
+        </section>
+
+        <!-- Información de Historial -->
+        <section id="content" class="hidden px-6 py-10 bg-white shadow-lg mx-auto max-w-6xl mt-8"></section>
+
+        <!-- Sección de perfil de usuario -->
+        <section id="perfilUsuario" class="hidden px-6 py-10 bg-white shadow-lg mx-auto max-w-6xl mt-8">
+            <h3 class="text-xl font-semibold text-center mb-4">Perfil del Usuario</h3>
+            <div class="space-y-4">
+                <div class="flex flex-col">
+                    <label for="nombre" class="text-sm font-semibold text-gray-600">Nombre</label>
+                    <input id="nombre" type="text" class="form-input px-4 py-2 border border-gray-300 rounded-lg"
+                        disabled />
+                </div>
+                <div class="flex flex-col">
+                    <label for="apellido" class="text-sm font-semibold text-gray-600">Apellido</label>
+                    <input id="apellido" type="text" class="form-input px-4 py-2 border border-gray-300 rounded-lg"
+                        disabled />
+                </div>
+                <div class="flex flex-col">
+                    <label for="direccion" class="text-sm font-semibold text-gray-600">Dirección</label>
+                    <input id="direccion" type="text" class="form-input px-4 py-2 border border-gray-300 rounded-lg"
+                        disabled />
+                </div>
+                <div class="flex flex-col">
+                    <label for="tipoUsuario" class="text-sm font-semibold text-gray-600">Tipo de Usuario</label>
+                    <input id="tipoUsuario" type="text" class="form-input px-4 py-2 border border-gray-300 rounded-lg"
+                        disabled />
+                </div>
+                <div class="flex justify-center mt-8">
+                    <button
+                        class="px-6 py-3 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-all"
+                        onclick="cerrarSesion()">Cerrar sesión</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Barra de navegación inferior -->
+        <footer class="bg-blue-600 text-white py-4 mt-auto">
+            <div class="flex justify-around max-w-6xl mx-auto">
+                <a href="#" id="inicioBtn" class="hover:underline">Inicio</a>
+                <a href="#" id="historialBtn" class="hover:underline">Historial</a>
+                <a href="#" id="perfilBtn" class="hover:underline">Perfil</a>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <p id="modalText"></p>
+            <button id="closeModalBtn" class="modal-button">OK</button>
+        </div>
+    </div>
+
+    <script>
+        let contract;
+        let clavePublica;
+        let contractHistory;
+
+        document.addEventListener("DOMContentLoaded", async function () {
+            const almacenClavePublica = localStorage.getItem("clavePublica");
+            console.log("Clave pública:", almacenClavePublica);
+            const direccionContrato = localStorage.getItem("direccionContrato");
+            console.log(direccionContrato);
+            const direccionContratoHistorial = '0x937D4654CE54b392655C4FF4b2415e60F4A9A02b'; // Dirección del contrato de historial de donaciones
+
+            if (almacenClavePublica && direccionContrato) {
+                clavePublica = almacenClavePublica;
+
+                // Cargar ABI de ToyDonationNFT de manera asincrónica con fetch
+                let contractABI;
+                try {
+                    const response = await fetch('../artifacts/contracts/ControlUsuarios.sol/DonacionesDeJuguetes.json');
+                    const data = await response.json();
+                    contractABI = data.abi;
+                } catch (error) {
+                    console.error('Error al cargar el ABI de ToyDonationNFT:', error);
+                    showModal("Hubo un problema al cargar el contrato de Donación.");
+                    return; // Salir si hay error en la carga
+                }
+
+                // Crear el contrato para Donación de Juguetes
+                const provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+                const signer = provider.getSigner();
+                contract = new ethers.Contract(direccionContrato, contractABI, signer);
+
+                // Cargar ABI de ToyDonationHistory de manera asincrónica con fetch
+                let historyABI;
+                try {
+                    const response = await fetch('../artifacts/contracts/Historial.sol/ToyDonationHistory.json');
+                    const data = await response.json();
+                    historyABI = data.abi;
+                } catch (error) {
+                    console.error('Error al cargar el ABI de ToyDonationHistory:', error);
+                    showModal("Hubo un problema al cargar el contrato de Historial.");
+                    return; // Salir si hay error en la carga
+                }
+
+                // Crear el contrato para Historial de Donaciones
+                contractHistory = new ethers.Contract(direccionContratoHistorial, historyABI, signer);
+
+                try {
+                    // Llamar a buscarUsuario para verificar el tipo de usuario y habilitar el botón de donación
+                    const usuario = await contract.buscarUsuario(clavePublica);
+                    const tipoUsuario = usuario[4];
+
+                    if (tipoUsuario && tipoUsuario.toLowerCase() === "donante") {
+                        document.getElementById("donarButton").disabled = false;
+                    }
+                } catch (error) {
+                    console.error("Error al intentar obtener el perfil del usuario:", error);
+                    showModal("Hubo un problema al obtener el perfil.");
+                }
+            }
+        });
+
+
+        // Función para mostrar el modal de errores o mensajes
+        function showModal(message) {
+            const modal = document.getElementById("myModal");
+            const modalText = document.getElementById("modalText");
+            modalText.innerText = message;
+            modal.style.display = "block";
+        }
+
+        async function mostrarHistorial() {
+            console.log(clavePublica);
+            try {
+                if (!clavePublica || !contractHistory) {
+                    alert(
+                        "No se encontraron credenciales del usuario. Inicia sesión primero."
+                    );
+                    return;
+                }
+
+                console.log("Consultando historial para la clave pública:", clavePublica);  // Verifica que la clave sea la correcta
+
+                // Llamada al contrato para obtener el historial de donaciones del usuario
+                const donations = await contractHistory.getDonationHistoryByAddress(
+                    clavePublica
+                );
+
+                let historialHtml =
+                    "<h2 class='text-4xl font-bold text-center text-blue-600 mb-6'>Historial de Donaciones de Juguetes</h2>";
+
+                // Contenedor para las donaciones
+                historialHtml +=
+                    "<div class='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8'>";
+
+                donations.forEach((donation) => {
+                    historialHtml += `
+            <div class='bg-white shadow-lg rounded-lg p-6'>
+                <h3 class='text-xl font-semibold text-blue-700 mb-2'>ID Transacción: #${donation.transactionId}</h3>
+                <p class='text-md text-gray-700 mb-2'><strong>Donante:</strong> ${donation.donor}</p>
+                <p class='text-md text-gray-700 mb-2'><strong>Receptor:</strong> ${donation.recipient}</p>
+                <p class='text-md text-gray-700 mb-2'><strong>Cantidad de Juguetes:</strong> ${donation.amount}</p>
+                <p class='text-md text-gray-700 mb-4'><strong>Fecha:</strong> ${new Date(donation.timestamp * 1000).toLocaleString()}</p>
+                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded w-full mt-2 transition duration-300 ease-in-out transform hover:scale-105">
+                    Ver Detalles
+                </button>
+            </div>
+        `;
+                });
+
+                historialHtml += "</div>"; // Cierre del contenedor
+
+                // Colocar el HTML en el contenedor
+                document.getElementById("content").innerHTML = historialHtml;
+                document.getElementById("content").classList.remove("hidden");
+                document.getElementById("perfilUsuario").classList.add("hidden");
+            } catch (error) {
+                console.error("Error al intentar obtener el historial de donaciones:", error);
+                alert("Hubo un problema al obtener el historial de donaciones.");
+            }
+        }
+
+
+        async function mostrarPerfil() {
+            try {
+                console.log(clavePublica);
+                console.log(contract);
+                if (!clavePublica || !contract) {
+                    alert(
+                        "No se encontraron credenciales del usuario. Inicia sesión primero."
+                    );
+                    return;
+                }
+
+                const usuario = await contract.buscarUsuario(clavePublica);
+                console.log("Usuario recibido:", usuario);
+
+                document.getElementById("nombre").value = usuario[0];
+                document.getElementById("apellido").value = usuario[1];
+                document.getElementById("direccion").value = usuario[2];
+                document.getElementById("tipoUsuario").value = usuario[4];
+
+                document.getElementById("content").classList.add("hidden");
+                document.getElementById("perfilUsuario").classList.remove("hidden");
+            } catch (error) {
+                console.error("Error al intentar obtener el perfil del usuario:", error);
+                alert("Hubo un problema al obtener la información del perfil.");
+            }
+        }
+
+        function mostrarSeccion(seccion) {
+            if (seccion === "inicio") {
+                location.reload();
+            }
+        }
+
+        function redirigirADonacion() {
+            if (!document.getElementById("donarButton").disabled) {
+                window.location.href = "donacion.html";
+            } else {
+                showModal("Solo los donantes pueden realizar una donación de juguetes.");
+            }
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem("clavePublica");
+            localStorage.removeItem("direccionContrato");
+
+            window.location.href = "Login.html";
+        }
+
+        document.getElementById("inicioBtn").addEventListener("click", function () {
+            mostrarSeccion("inicio");
+        });
+
+        document.getElementById("historialBtn").addEventListener("click", function () {
+            mostrarHistorial();
+        });
+
+        document.getElementById("perfilBtn").addEventListener("click", function () {
+            mostrarPerfil();
+        });
+    </script>
+
+</body>
+
+</html>

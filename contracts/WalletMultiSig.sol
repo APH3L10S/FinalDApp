@@ -50,6 +50,7 @@ contract ToyDonationMultiSig {
         _;
     }
 
+    // Función para enviar una transacción
     function submitTransaction(address _to, uint _amount) public onlyOwner {
         transactions.push(Transaction({
             to: _to,
@@ -62,6 +63,7 @@ contract ToyDonationMultiSig {
         emit TransactionSubmitted(transactions.length - 1, _to, _amount);
     }
 
+    // Función para aprobar una transacción
     function approveTransaction(uint _transactionId) public onlyOwner {
         Transaction storage transaction = transactions[_transactionId];
         require(!transaction.executed, "La transaccion ya fue ejecutada");
@@ -77,6 +79,7 @@ contract ToyDonationMultiSig {
         emit TransactionApproved(_transactionId, msg.sender);
     }
 
+    // Función para ejecutar una transacción aprobada
     function executeTransaction(uint _transactionId) public onlyOwner {
         Transaction storage transaction = transactions[_transactionId];
         require(transaction.state == TransactionState.Approved, "No se han aprobado suficientes transacciones");
@@ -85,24 +88,39 @@ contract ToyDonationMultiSig {
         transaction.executed = true;
         transaction.state = TransactionState.Executed;
 
+        // Ejecutar la transferencia
         (bool success, ) = transaction.to.call{value: transaction.amount}("");
         require(success, "Fallo en la transferencia de fondos");
 
         emit TransactionExecuted(_transactionId, transaction.to, transaction.amount);
 
+        // Registrar la donación en el contrato de historial
         toyDonationHistory.recordDonation(_transactionId, msg.sender, transaction.to, transaction.amount);
     }
 
+    // Función para depositar fondos en el contrato
     function deposit() public payable {
         require(msg.value > 0, "Debe enviar un valor mayor a 0");
         emit Deposit(msg.sender, msg.value);
     }
 
+    // Función para obtener el estado de la transacción
+    function getTransactionState(uint _transactionId) public view returns (TransactionState) {
+        return transactions[_transactionId].state;
+    }
+
+    // Función para obtener detalles de la transacción
     function getTransaction(uint _transactionId) public view returns (address to, uint amount, uint approvalCount, bool executed, TransactionState state) {
         Transaction storage transaction = transactions[_transactionId];
         return (transaction.to, transaction.amount, transaction.approvalCount, transaction.executed, transaction.state);
     }
 
+    // Función para obtener todos los owners
+    function getOwners() public view returns (address[] memory) {
+        return owners;
+    }
+
+    // Función para obtener todas las transacciones
     function getTransactions() public view returns (Transaction[] memory) {
         return transactions;
     }
